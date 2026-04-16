@@ -66,3 +66,18 @@ pipeline {
                 docker rm -f ${CONTAINER_NAME} || true
                 docker run -d -p 3000:3000 --name ${CONTAINER_NAME} ${DOCKER_IMAGE}
                 """
+            }
+        }
+
+    }   // ✅ closes stages
+
+    post {
+        success {
+            echo "✅ Pipeline SUCCESS"
+        }
+        failure {
+            echo "❌ Pipeline FAILED"
+        }
+    }
+
+}   // ✅ closes pipeline
