@@ -24,7 +24,7 @@ pipeline {
 
             steps {
 
-                git credentialsId: 'github-creds', url: 'https://github.com/YOUR_USERNAME/YOUR_REPO.git'
+                git credentialsId: 'github-creds', url: 'https://github.com/NitinSimhadri/CICD-WITH-SONARQUBE.git'
 
             }
 
