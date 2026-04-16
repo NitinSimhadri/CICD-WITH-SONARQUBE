@@ -2,7 +2,7 @@ pipeline {
     agent any
  
     environment {
-        DOCKER_IMAGE = "poc-secure-api"
+        DOCKER_IMAGE = "poc-image"
         CONTAINER_NAME = "poc-container"
     }
  
