@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:18-alpine'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
 
     environment {
         DOCKER_IMAGE   = "poc-secure-api"
@@ -13,7 +8,7 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
                 git branch: 'main',
                     url: 'https://github.com/NitinSimhadri/CICD-WITH-SONARQUBE.git'
@@ -35,13 +30,18 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonarqube-server') {
-                    sh '''
-                    sonar-scanner \
-                      -Dsonar.projectKey=poc-secure-api \
-                      -Dsonar.sources=. \
-                      -Dsonar.host.url=http://16.176.161.129:9000 \
-                      -Dsonar.login=$SONAR_AUTH_TOKEN
-                    '''
+                    script {
+                        def scannerHome = tool(
+                            name: 'SonarScanner',
+                            type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                        )
+
+                        sh """
+                        ${scannerHome}/bin/sonar-scanner \
+                          -Dsonar.projectKey=poc-secure-api \
+                          -Dsonar.sources=.
+                        """
+                    }
                 }
             }
         }
@@ -60,7 +60,7 @@ pipeline {
             }
         }
 
-        stage('Deploy Container') {
+        stage('Run Container') {
             steps {
                 sh """
                 docker rm -f ${CONTAINER_NAME} || true
@@ -68,16 +68,15 @@ pipeline {
                 """
             }
         }
-
-    }   // ✅ closes stages
+    }
 
     post {
         success {
-            echo "✅ Pipeline SUCCESS"
+            echo "✅ Pipeline Success – Deployment Done"
         }
         failure {
-            echo "❌ Pipeline FAILED"
+            echo "❌ Pipeline Failed – Check SonarQube Issues"
         }
     }
+}
 
-}   // ✅ closes pipeline
